@@ -11,7 +11,6 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
 class SystemUIHooker {
     companion object {
         private const val tileId = "custom(${BuildConfig.APPLICATION_ID}/.QuickTile)"
-        private var tileAdded = false
         private var tileRevealed = false
 
         @SuppressLint("PrivateApi")
@@ -20,7 +19,7 @@ class SystemUIHooker {
                 name == "setTiles" && isPublic && paramCount == 0
             }.hookMethod {
                 before { param ->
-                    if (!tileAdded) {
+                    if (!tileRevealed) {
                         val tileHost = XposedHelpers.getObjectField(param.thisObject, "mHost")
 
                         /*
@@ -44,7 +43,6 @@ class SystemUIHooker {
                         }
 
                         XposedBridge.log("[Let Me Downgrade] Tile added to quick settings panel.")
-                        tileAdded = true
                     }
                 }
             }
