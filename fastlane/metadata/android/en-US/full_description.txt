@@ -1,0 +1,14 @@
+Android's app installation system does not allow users to downgrade to an older version of an app when they already have a newer version installed. On Android 5 through 12, the <a href='https://github.com/Xposed-Modules-Repo/com.alex193a.xdowngrader' target='_blank' rel='nofollow'>XDowngrader</a> Xposed module could be used on rooted devices to bypass this limitation. As of Android 13, however, XDowngrader no longer works.
+
+<i>Let Me Downgrade</i> is an Xposed module that replicates this functionality for Android 13, and as an added bonus, provides a Quick Settings tile to easily enable and disable the downgrade block.
+
+<b>⚠️ WARNING:</b> <i>Let Me Downgrade</i> is intended for rooted devices running Android 13 and requires Xposed. The recommended Xposed variant to use is LSPosed. Other Xposed variants may work, but have not been tested. Additionally, this module cannot be guaranteed to work on all devices. In the worst case, it can cause a bootloop. Use at your own risk.
+
+To use Let Me Downgrade:
+
+1. Install LSposed. This requires your device to be rooted with Magisk. Installation instructions for LSPosed are available <a href='https://github.com/LSPosed/LSPosed#install' target='_blank' rel='nofollow'>here</a>.
+2. Install Let Me Downgrade.
+3. Activate the Let Me Downgrade module in the LSposed user interface.
+4. Reboot your device and sign in.
+5. Open the quick settings panel. The Let Me Downgrade tile will appear.
+6. Toggle the Let Me Downgrade tile on or off to enable or disable it.
