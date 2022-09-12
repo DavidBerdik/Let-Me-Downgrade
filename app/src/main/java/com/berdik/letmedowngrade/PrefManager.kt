@@ -1,8 +1,10 @@
 package com.berdik.letmedowngrade
 
 import android.annotation.SuppressLint
+import android.content.ComponentName
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 
 class PrefManager {
     companion object {
@@ -23,6 +25,7 @@ class PrefManager {
                         Context.MODE_WORLD_READABLE
                     )
                     markTileRevealAsDone()
+                    hideModuleIcon(context)
                 }
             } catch (e: SecurityException) {
                 noXposed = true
@@ -54,6 +57,15 @@ class PrefManager {
                 val prefEdit = prefs!!.edit()
                 prefEdit.putBoolean("tileRevealDone", true)
                 prefEdit.apply()
+            }
+        }
+
+        private fun hideModuleIcon(context: Context) {
+            if (!noXposed) {
+                context.packageManager.setComponentEnabledSetting(ComponentName(context,
+                    InstructionsActivity::class.java),
+                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                    PackageManager.DONT_KILL_APP)
             }
         }
     }

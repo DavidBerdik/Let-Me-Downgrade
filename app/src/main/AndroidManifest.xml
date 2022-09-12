@@ -3,8 +3,19 @@
     package="com.berdik.letmedowngrade">
 
     <application
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:icon="@mipmap/ic_launcher">
+        android:theme="@style/Theme.AppCompat">
+        <activity
+            android:name=".InstructionsActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <meta-data
             android:name="xposedmodule"
             android:value="true" />
@@ -18,16 +29,20 @@
             android:name="xposedscope"
             android:resource="@array/xposed_scope" />
 
-        <service android:name="com.berdik.letmedowngrade.QuickTile"
+        <service
+            android:name=".QuickTile"
+            android:exported="true"
             android:icon="@drawable/ic_baseline_arrow_downward_24"
             android:label="@string/tile_label"
-            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
-            android:exported="true">
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
-            <meta-data android:name="android.service.quicksettings.TOGGLEABLE_TILE"
+
+            <meta-data
+                android:name="android.service.quicksettings.TOGGLEABLE_TILE"
                 android:value="true" />
         </service>
     </application>
+
 </manifest>
