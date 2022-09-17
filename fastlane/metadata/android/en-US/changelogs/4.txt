@@ -1,0 +1,1 @@
+This release adds in-app instructions describing how to configure and use the app. The instructions are accessible via the "Let Me Downgrade" app entry in your app drawer. Once the app is activated in Xposed, the app will automatically be removed from your app drawer to reduce clutter. Additionally, a bug which caused the app to crash when not activated in Xposed was fixed.
