@@ -1,6 +1,5 @@
 package com.berdik.letmedowngrade.hookers
 
-import android.annotation.SuppressLint
 import com.berdik.letmedowngrade.BuildConfig
 import com.github.kyuubiran.ezxhelper.utils.*
 import de.robv.android.xposed.XSharedPreferences
@@ -10,9 +9,19 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
 
 class PackageManagerServiceHooker {
     companion object {
-        @SuppressLint("PrivateApi")
         fun hook(lpparam: XC_LoadPackage.LoadPackageParam) {
-            findAllMethods(lpparam.classLoader.loadClass("com.android.server.pm.PackageManagerServiceUtils")) {
+            /*
+            Hook both classes in which checkDowngrade() may appear. The first is the Android 12 AOSP
+            variant and the second is the Android 13 AOSP variant. In a perfect world, a conditional
+            check would be used here to determine which one should be hooked, but since OEMs tend to
+            to deviate from AOSP, attempting to hook in both classes is the safest option.
+             */
+            genericCheckDowngradeHook(lpparam, "com.android.server.pm.PackageManagerService")
+            genericCheckDowngradeHook(lpparam, "com.android.server.pm.PackageManagerServiceUtils")
+        }
+
+        private fun genericCheckDowngradeHook(lpparam: XC_LoadPackage.LoadPackageParam, className: String) {
+            findAllMethods(lpparam.classLoader.loadClass(className)) {
                 name == "checkDowngrade"
             }.hookMethod {
                 var packageName = ""
