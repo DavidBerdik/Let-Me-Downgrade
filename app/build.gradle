@@ -5,6 +5,7 @@ plugins {
 
 android {
     compileSdk 33
+    buildToolsVersion "33.0.0"
 
     defaultConfig {
         applicationId "com.berdik.letmedowngrade"
@@ -41,10 +42,8 @@ android {
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.5.1'
-    implementation 'com.github.kyuubiran:EzXHelper:1.0.1'
-    implementation 'com.github.kyuubiran:EzXHelper:1.0.1:sources'
+    implementation 'com.github.kyuubiran:EzXHelper:1.0.3'
     implementation 'com.github.mukeshsolanki:MarkdownView-Android:2.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     compileOnly 'de.robv.android.xposed:api:82'
-    compileOnly 'de.robv.android.xposed:api:82:sources'
 }
