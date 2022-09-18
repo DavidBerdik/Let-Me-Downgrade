@@ -1,0 +1,1 @@
+This release adds support for Android 12 as well as support for restoring the module icon to the app drawer when an attempt is made to use the quick settings tile after the module has been disabled or Xposed was uninstalled.
