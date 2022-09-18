@@ -24,12 +24,12 @@ class PrefManager {
                         BuildConfig.APPLICATION_ID,
                         Context.MODE_WORLD_READABLE
                     )
-                    markTileRevealAsDone()
-                    hideModuleIcon(context)
                 }
             } catch (e: SecurityException) {
                 noXposed = true
             }
+            markTileRevealAsDone()
+            toggleModuleIcon(context)
         }
 
         fun isHookOn(): Boolean {
@@ -60,13 +60,16 @@ class PrefManager {
             }
         }
 
-        private fun hideModuleIcon(context: Context) {
-            if (!noXposed) {
-                context.packageManager.setComponentEnabledSetting(ComponentName(context,
-                    InstructionsActivity::class.java),
-                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                    PackageManager.DONT_KILL_APP)
+        private fun toggleModuleIcon(context: Context) {
+            // Assume that the state to set is disabling the icon, and flip it to enabling the
+            // icon if no Xposed is detected.
+            var stateToSet = PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+            if (noXposed) {
+                stateToSet = PackageManager.COMPONENT_ENABLED_STATE_ENABLED
             }
+
+            context.packageManager.setComponentEnabledSetting(ComponentName(context,
+                InstructionsActivity::class.java), stateToSet, PackageManager.DONT_KILL_APP)
         }
     }
 }
