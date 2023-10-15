@@ -6,7 +6,7 @@ Let Me Downgrade is designed for rooted phones running Xposed on Android 12 thro
 
 ### To use Let Me Downgrade:
 <ol>
-    <li>Install LSposed. This requires your device to be rooted with Magisk. Installation instructions for LSPosed are available [here](https://github.com/LSPosed/LSPosed#install).</li>
+    <li>Install LSposed. This requires your device to be rooted with Magisk or KernelSU. Installation instructions for LSPosed are available [here](https://github.com/LSPosed/LSPosed#install).</li>
     <li>Install Let Me Downgrade.</li>
     <li>Activate the Let Me Downgrade module in the LSposed user interface.</li>
 </ol>

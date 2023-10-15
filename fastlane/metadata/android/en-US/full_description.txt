@@ -4,7 +4,7 @@ Android's app installation system does not allow users to downgrade to an older 
 
 To use Let Me Downgrade:
 
-1. Install LSposed. This requires your device to be rooted with Magisk. Installation instructions for LSPosed are available <a href='https://github.com/LSPosed/LSPosed#install' target='_blank' rel='nofollow'>here</a>.
+1. Install LSposed. This requires your device to be rooted with Magisk or KernelSU. Installation instructions for LSPosed are available <a href='https://github.com/LSPosed/LSPosed#install' target='_blank' rel='nofollow'>here</a>.
 2. Install Let Me Downgrade.
 3. Activate the Let Me Downgrade module in the LSposed user interface.
 4. Reboot your device and sign in.
