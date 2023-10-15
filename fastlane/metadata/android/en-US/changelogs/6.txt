@@ -1,0 +1,1 @@
+This release adds support for Android 14. As of this release, use of the LSPosed variant of Xposed is now mandatory. Other Xposed variants will not work.
