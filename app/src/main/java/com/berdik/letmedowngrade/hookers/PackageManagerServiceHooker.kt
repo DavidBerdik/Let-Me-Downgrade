@@ -22,10 +22,11 @@ class PackageManagerServiceHooker {
             this.module = module
 
             /*
-            Hook both classes in which checkDowngrade() may appear. The first is the Android 12 AOSP
-            variant and the second is the Android 13 AOSP variant. In a perfect world, a conditional
-            check would be used here to determine which one should be hooked, but since OEMs tend to
-            to deviate from AOSP, attempting to hook in both classes is the safest option.
+                Attempt to hook one of two different classes in which checkDowngrade() may appear.
+                The first is the Android 12 AOSP variant and the second is the Android 13+ AOSP
+                variant. In a perfect world, a conditional check would be used here to determine
+                which one should be hooked, but since OEMs tend to deviate from AOSP, attempting
+                to hook in one class and failing over to the other class is the safest option.
              */
             try {
                 // Android 12 AOSP variant.
