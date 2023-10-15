@@ -2,44 +2,41 @@ package com.berdik.letmedowngrade
 
 import com.berdik.letmedowngrade.hookers.SystemUIHooker
 import com.berdik.letmedowngrade.hookers.PackageManagerServiceHooker
-import com.github.kyuubiran.ezxhelper.init.EzXHelperInit
-import de.robv.android.xposed.IXposedHookLoadPackage
-import de.robv.android.xposed.IXposedHookZygoteInit
-import de.robv.android.xposed.XSharedPreferences
-import de.robv.android.xposed.XposedBridge
-import de.robv.android.xposed.callbacks.XC_LoadPackage
+import io.github.libxposed.api.XposedInterface
+import io.github.libxposed.api.XposedModule
+import io.github.libxposed.api.XposedModuleInterface.ModuleLoadedParam
+import io.github.libxposed.api.XposedModuleInterface.PackageLoadedParam
+import io.github.libxposed.api.XposedModuleInterface.SystemServerLoadedParam
 
-class LetMeDowngrade : IXposedHookZygoteInit, IXposedHookLoadPackage {
-    override fun initZygote(startupParam: IXposedHookZygoteInit.StartupParam) {
-        EzXHelperInit.initZygote(startupParam)
+private lateinit var module: LetMeDowngrade
+
+class LetMeDowngrade(base: XposedInterface, param: ModuleLoadedParam) : XposedModule(base, param) {
+    init {
+        module = this
     }
 
-    override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam?) {
-        if (lpparam != null) {
-            EzXHelperInit.initHandleLoadPackage(lpparam)
-            EzXHelperInit.setLogTag("Let Me Downgrade")
-            EzXHelperInit.setToastTag("Let Me Downgrade")
-            
-            when (lpparam.packageName) {
-                "android" -> {
-                    try {
-                        PackageManagerServiceHooker.hook(lpparam)
-                    } catch (e: Exception) {
-                        XposedBridge.log("[Let Me Downgrade] ERROR: $e")
-                    }
-                }
-            }
+    override fun onSystemServerLoaded(param: SystemServerLoadedParam) {
+        super.onSystemServerLoaded(param)
 
-            when (lpparam.packageName) {
-                "com.android.systemui" -> {
-                    val prefs = XSharedPreferences(BuildConfig.APPLICATION_ID, BuildConfig.APPLICATION_ID)
-                    if (!prefs.getBoolean("tileRevealDone", false)) {
-                        try {
-                            XposedBridge.log("[Let Me Downgrade] Hooking System UI to add and reveal quick settings tile.")
-                            SystemUIHooker.hook(lpparam)
-                        } catch (e: Exception) {
-                            XposedBridge.log("[Let Me Downgrade] ERROR: $e")
-                        }
+        try {
+            PackageManagerServiceHooker.hook(param, module)
+        } catch (e: Exception) {
+            module.log("[Let Me Downgrade] ERROR: $e")
+        }
+    }
+
+    override fun onPackageLoaded(param: PackageLoadedParam) {
+        super.onPackageLoaded(param)
+
+        when (param.packageName) {
+            "com.android.systemui" -> {
+                val prefs = getRemotePreferences(BuildConfig.APPLICATION_ID)
+                if (!prefs.getBoolean("tileRevealDone", false)) {
+                    try {
+                        module.log("[Let Me Downgrade] Hooking System UI to add and reveal quick settings tile.")
+                        SystemUIHooker.hook(param, module)
+                    } catch (e: Exception) {
+                        module.log("[Let Me Downgrade] ERROR: $e")
                     }
                 }
             }

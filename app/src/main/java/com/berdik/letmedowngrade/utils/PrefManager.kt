@@ -1,39 +1,34 @@
-package com.berdik.letmedowngrade
+package com.berdik.letmedowngrade.utils
 
-import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import com.berdik.letmedowngrade.BuildConfig
+import com.berdik.letmedowngrade.InstructionsActivity
+import io.github.libxposed.service.XposedService
+import io.github.libxposed.service.XposedServiceHelper
 
 class PrefManager {
     companion object {
         private var prefs: SharedPreferences? = null
         private var hookActive: Boolean? = null
-        private var noXposed = false
 
-        // Since we are an Xposed module, we don't care about MODE_WORLD_READABLE being deprecated.
-        // In fact, we need to use it despite being deprecated because without it, the Xposed
-        // hooking mechanism cannot access the preference value.
-        @SuppressLint("WorldReadableFiles")
-        @Suppress("DEPRECATION")
         fun loadPrefs(context: Context) {
-            try {
-                if (prefs == null) {
-                    prefs = context.getSharedPreferences(
-                        BuildConfig.APPLICATION_ID,
-                        Context.MODE_WORLD_READABLE
-                    )
+            XposedServiceHelper.registerListener(object : XposedServiceHelper.OnServiceListener {
+                override fun onServiceBind(service: XposedService) {
+                    XposedChecker.flagAsEnabled()
+                    prefs = service.getRemotePreferences(BuildConfig.APPLICATION_ID)
                 }
-            } catch (e: SecurityException) {
-                noXposed = true
-            }
+
+                override fun onServiceDied(service: XposedService) {}
+            })
             markTileRevealAsDone()
             toggleModuleIcon(context)
         }
 
         fun isHookOn(): Boolean {
-            if (noXposed) {
+            if (!XposedChecker.isEnabled()) {
                 return false
             }
 
@@ -44,7 +39,7 @@ class PrefManager {
         }
 
         fun toggleHookState() {
-            if (!noXposed) {
+            if (XposedChecker.isEnabled()) {
                 hookActive = !isHookOn()
                 val prefEdit = prefs!!.edit()
                 prefEdit.putBoolean("hookActive", hookActive!!)
@@ -53,7 +48,7 @@ class PrefManager {
         }
 
         private fun markTileRevealAsDone() {
-            if (!noXposed) {
+            if (XposedChecker.isEnabled()) {
                 val prefEdit = prefs!!.edit()
                 prefEdit.putBoolean("tileRevealDone", true)
                 prefEdit.apply()
@@ -64,7 +59,7 @@ class PrefManager {
             // Assume that the state to set is disabling the icon, and flip it to enabling the
             // icon if no Xposed is detected.
             var stateToSet = PackageManager.COMPONENT_ENABLED_STATE_DISABLED
-            if (noXposed) {
+            if (!XposedChecker.isEnabled()) {
                 stateToSet = PackageManager.COMPONENT_ENABLED_STATE_ENABLED
             }
 

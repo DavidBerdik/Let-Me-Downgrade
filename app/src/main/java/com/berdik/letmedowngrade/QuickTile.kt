@@ -2,6 +2,7 @@ package com.berdik.letmedowngrade
 
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
+import com.berdik.letmedowngrade.utils.PrefManager
 
 class QuickTile: TileService() {
     override fun onStartListening() {

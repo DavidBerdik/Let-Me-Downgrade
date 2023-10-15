@@ -1,51 +1,77 @@
 package com.berdik.letmedowngrade.hookers
 
+import android.annotation.SuppressLint
 import com.berdik.letmedowngrade.BuildConfig
-import com.github.kyuubiran.ezxhelper.utils.*
-import de.robv.android.xposed.XSharedPreferences
-import de.robv.android.xposed.XposedBridge
-import de.robv.android.xposed.XposedHelpers
-import de.robv.android.xposed.callbacks.XC_LoadPackage
+import com.berdik.letmedowngrade.utils.XposedHelpers
+import io.github.libxposed.api.XposedInterface
+import io.github.libxposed.api.XposedInterface.AfterHookCallback
+import io.github.libxposed.api.XposedInterface.BeforeHookCallback
+import io.github.libxposed.api.XposedModule
+import io.github.libxposed.api.XposedModuleInterface.SystemServerLoadedParam
+import io.github.libxposed.api.annotations.AfterInvocation
+import io.github.libxposed.api.annotations.BeforeInvocation
+import io.github.libxposed.api.annotations.XposedHooker
+import java.lang.reflect.Method
 
 class PackageManagerServiceHooker {
     companion object {
-        fun hook(lpparam: XC_LoadPackage.LoadPackageParam) {
+        var module: XposedModule? = null
+
+        @SuppressLint("PrivateApi")
+        fun hook(param: SystemServerLoadedParam, module: XposedModule) {
+            this.module = module
+
             /*
             Hook both classes in which checkDowngrade() may appear. The first is the Android 12 AOSP
             variant and the second is the Android 13 AOSP variant. In a perfect world, a conditional
             check would be used here to determine which one should be hooked, but since OEMs tend to
             to deviate from AOSP, attempting to hook in both classes is the safest option.
              */
-            genericCheckDowngradeHook(lpparam, "com.android.server.pm.PackageManagerService")
-            genericCheckDowngradeHook(lpparam, "com.android.server.pm.PackageManagerServiceUtils")
+            try {
+                // Android 12 AOSP variant.
+                val pmClass = param.classLoader.loadClass("com.android.server.pm.PackageManagerService")
+                val checkDowngradeMethod = findCheckDowngradeMethod(pmClass.methods) as Method
+                module.hook(checkDowngradeMethod, DowngradeCheckerGenericHooker::class.java)
+            } catch (e: Exception) {
+                // Android 13+ AOSP variant.
+                val pmClass = param.classLoader.loadClass("com.android.server.pm.PackageManagerServiceUtils")
+                val checkDowngradeMethod = findCheckDowngradeMethod(pmClass.methods) as Method
+                module.hook(checkDowngradeMethod, DowngradeCheckerGenericHooker::class.java)
+            }
         }
 
-        private fun genericCheckDowngradeHook(lpparam: XC_LoadPackage.LoadPackageParam, className: String) {
-            findAllMethods(lpparam.classLoader.loadClass(className)) {
-                name == "checkDowngrade"
-            }.hookMethod {
-                var packageName = ""
-                var isHookActive = false
+        private fun findCheckDowngradeMethod (methods: Array<Method>): Method? {
+            for (method in methods) {
+                if (method.name == "checkDowngrade") {
+                    return method
+                }
+            }
+            return null
+        }
 
-                before { param ->
-                    // Get the package name of the app being processed.
-                    packageName = XposedHelpers.getObjectField(param.args[1], "packageName") as String
+        @XposedHooker
+        private class DowngradeCheckerGenericHooker(private val isHookActive: Boolean, private val packageName: String) : XposedInterface.Hooker {
+            companion object {
+                @JvmStatic
+                @BeforeInvocation
+                fun beforeInvocation(callback: BeforeHookCallback): DowngradeCheckerGenericHooker {
+                    val prefs = module?.getRemotePreferences(BuildConfig.APPLICATION_ID)
+                    val isHookActive = prefs?.getBoolean("hookActive", false)
+                    val packageName = XposedHelpers.getObjectField(callback.args[1], "packageName") as String
 
-                    // Get the active state of the hook.
-                    val prefs = XSharedPreferences(BuildConfig.APPLICATION_ID, BuildConfig.APPLICATION_ID)
-                    isHookActive = prefs.getBoolean("hookActive", false)
-
-                    // If the hook is active, log a block of the downgrade check and bypass the real function.
-                    if (isHookActive) {
-                        XposedBridge.log("[Let Me Downgrade] Blocked downgrade check on package: $packageName")
-                        param.result = null
+                    if (isHookActive!!) {
+                        module?.log("[Let Me Downgrade] Blocked downgrade check on package: $packageName")
+                        callback.returnAndSkip(null)
                     }
+
+                    return DowngradeCheckerGenericHooker(isHookActive, packageName)
                 }
 
-                after {
-                    // If the hook is not active, make a log entry after the real function executes indicating so.
-                    if (!isHookActive) {
-                        XposedBridge.log("[Let Me Downgrade] Allowed downgrade check on package: $packageName")
+                @JvmStatic
+                @AfterInvocation
+                fun afterInvocation(callback: AfterHookCallback, context: DowngradeCheckerGenericHooker) {
+                    if (!context.isHookActive) {
+                        module?.log("[Let Me Downgrade] Allowed downgrade check on package: ${context.packageName}")
                     }
                 }
             }
