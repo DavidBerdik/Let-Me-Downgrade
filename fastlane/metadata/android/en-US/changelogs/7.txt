@@ -1,0 +1,3 @@
+Let Me Downgrade 1.0.4 fixes a compilation issue that caused the release builds of Let Me Downgrade 1.0.3 to not work properly.
+
+Changelog for Let Me Downgrade 1.0.3: This release adds support for Android 14. As of this release, use of the LSPosed variant of Xposed is now mandatory. Other Xposed variants will not work.
