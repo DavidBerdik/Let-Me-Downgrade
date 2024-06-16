@@ -1,0 +1,1 @@
+This release reduces the amount of storage space used by the module and improves the module's performance.
