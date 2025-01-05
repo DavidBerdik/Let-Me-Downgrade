@@ -17,36 +17,44 @@ class PackageManagerServiceHooker {
     companion object {
         var module: XposedModule? = null
 
-        @SuppressLint("PrivateApi")
         fun hook(param: SystemServerLoadedParam, module: XposedModule) {
             this.module = module
-
-            /*
-                Attempt to hook one of two different classes in which checkDowngrade() may appear.
-                The first is the Android 12 AOSP variant and the second is the Android 13+ AOSP
-                variant. In a perfect world, a conditional check would be used here to determine
-                which one should be hooked, but since OEMs tend to deviate from AOSP, attempting
-                to hook in one class and failing over to the other class is the safest option.
-             */
-            try {
-                // Android 12 AOSP variant.
-                val pmClass = param.classLoader.loadClass("com.android.server.pm.PackageManagerService")
-                val checkDowngradeMethod = findCheckDowngradeMethod(pmClass.methods) as Method
-                module.hook(checkDowngradeMethod, DowngradeCheckerGenericHooker::class.java)
-            } catch (e: Exception) {
-                // Android 13+ AOSP variant.
-                val pmClass = param.classLoader.loadClass("com.android.server.pm.PackageManagerServiceUtils")
-                val checkDowngradeMethod = findCheckDowngradeMethod(pmClass.methods) as Method
-                module.hook(checkDowngradeMethod, DowngradeCheckerGenericHooker::class.java)
-            }
+            val checkDowngradeMethod = findCheckDowngradeMethod(param.classLoader) as Method
+            module.hook(checkDowngradeMethod, DowngradeCheckerGenericHooker::class.java)
         }
 
-        private fun findCheckDowngradeMethod (methods: Array<Method>): Method? {
-            for (method in methods) {
-                if (method.name == "checkDowngrade") {
-                    return method
-                }
-            }
+        @SuppressLint("PrivateApi")
+        private fun findCheckDowngradeMethod(classLoader: ClassLoader): Method? {
+            /*
+                Using a conditional check here to determine the Android version being used would be
+                preferred, but since OEMs tend to deviate from the AOSP source code, it is safer to
+                use a series of try-catches instead.
+             */
+
+            // Android 12 through Android 12 QPR 1
+            try {
+                val pmClass = classLoader.loadClass("com.android.server.pm.PackageManagerService")
+                return pmClass.getDeclaredMethod("checkDowngrade",
+                    classLoader.loadClass("com.android.server.pm.parsing.pkg.AndroidPackage"),
+                    classLoader.loadClass("android.content.pm.PackageInfoLite"))
+            } catch (_: Exception) {}
+
+            // Android 13 through Android 13 QPR 1
+            try {
+                val pmClass = classLoader.loadClass("com.android.server.pm.PackageManagerServiceUtils")
+                return pmClass.getDeclaredMethod("checkDowngrade",
+                    classLoader.loadClass("com.android.server.pm.parsing.pkg.AndroidPackage"),
+                    classLoader.loadClass("android.content.pm.PackageInfoLite"))
+            } catch (_: Exception) {}
+
+            // Android 14 through Android 15
+            try {
+                val pmClass = classLoader.loadClass("com.android.server.pm.PackageManagerServiceUtils")
+                return pmClass.getDeclaredMethod("checkDowngrade",
+                    classLoader.loadClass("com.android.server.pm.pkg.AndroidPackage"),
+                    classLoader.loadClass("android.content.pm.PackageInfoLite"))
+            } catch (_: Exception) {}
+
             return null
         }
 
@@ -58,7 +66,7 @@ class PackageManagerServiceHooker {
                 fun beforeInvocation(callback: BeforeHookCallback): DowngradeCheckerGenericHooker {
                     val prefs = module?.getRemotePreferences(BuildConfig.APPLICATION_ID)
                     val isHookActive = prefs?.getBoolean("hookActive", false)
-                    val packageName = XposedHelpers.getObjectField(callback.args[1], "packageName") as String
+                    val packageName = XposedHelpers.getObjectField(callback.args.last(), "packageName") as String
 
                     if (isHookActive!!) {
                         module?.log("[Let Me Downgrade] Blocked downgrade check on package: $packageName")
