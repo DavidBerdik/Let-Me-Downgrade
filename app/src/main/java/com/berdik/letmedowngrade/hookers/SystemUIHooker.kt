@@ -14,12 +14,14 @@ import io.github.libxposed.api.annotations.XposedHooker
 class SystemUIHooker {
     companion object {
         var module: XposedModule? = null
-        private const val tileId = "custom(${BuildConfig.APPLICATION_ID}/.QuickTile)"
+        var classLoader: ClassLoader? = null
+        private const val TILE_ID = "custom(${BuildConfig.APPLICATION_ID}/.QuickTile)"
         private var tileRevealed = false
 
         @SuppressLint("PrivateApi")
         fun hook(param: PackageLoadedParam, module: XposedModule) {
             this.module = module
+            classLoader = param.classLoader
 
             module.hook(
                 param.classLoader.loadClass("com.android.systemui.qs.QSPanelControllerBase")
@@ -37,6 +39,7 @@ class SystemUIHooker {
         @XposedHooker
         private class TileSetterHooker : XposedInterface.Hooker {
             companion object {
+                @SuppressLint("PrivateApi")
                 @JvmStatic
                 @BeforeInvocation
                 fun beforeInvocation(callback: BeforeHookCallback): TileSetterHooker {
@@ -45,28 +48,37 @@ class SystemUIHooker {
                         val tileHostClass = tileHost.javaClass as Class<*>
 
                         /*
-                        According to the AOSP 13 source code, the addTile function was not changed,
-                        however, it was not hooking properly on the Android 13 Pixel 4a August 2022
-                        Factory Image. Listing the declared methods of the class revealed that the
-                        function's parameters had been reversed in the shipped image even though
-                        AOSP did not reflect this. To account for this discrepancy, we try calling
-                        the Android 13 Pixel variant first, and if it fails, we fall back to the
-                        other variant. Ideally, we would check the API version here with a proper
-                        conditional, but since it is possible that Android 13 builds will use the
-                        old variant of the function, this uglier but safer approach is used instead.
+                            The range of supported Android versions for Let Me Downgrade (12 through 15 QPR 1 as of this comment) use
+                            several different approaches for adding tiles to the tile drawer. This collection of try-catch blocks
+                            accounts for the different approaches that are used. Ideally, using conditional checks to identify the
+                            Android version would be preferred, but since different OEMs may use different variations across the same
+                            Android version, using try-catch blocks is safer.
                          */
                         try {
-                            // Used by Android 13 Pixel 4a August 2022 Factory Image.
-                            tileHostClass.getDeclaredMethod("addTile", Int::class.java, String::class.java)
-                                .invoke(tileHost, -1, tileId)
+                            val tileSpecClass = classLoader!!.loadClass("com.android.systemui.qs.pipeline.shared.TileSpec\$Companion")
+                            val createMethod = tileSpecClass.getDeclaredMethod("create", String::class.java)
+                            val tileSpecObject = createMethod.invoke(null, TILE_ID) as Any
+                            val componentName = XposedHelpers.getObjectField(tileSpecObject, "componentName") as Any
+
+                            tileHostClass.getDeclaredMethod("addTile",
+                                classLoader!!.loadClass("android.content.ComponentName"),
+                                Boolean::class.javaPrimitiveType)
+                                .invoke(tileHost, componentName, true)
+
+                            module?.log("[Let Me Downgrade] Tile added to quick settings panel.")
                         }
                         catch (t: Throwable) {
-                            // Used by Android 12, and possibly some Android 13 distros.
-                            tileHostClass.getDeclaredMethod("addTile", String::class.java, Int::class.java)
-                                .invoke(tileHost, tileId, -1)
+                            try {
+                                tileHostClass.getDeclaredMethod("addTile", Int::class.java, String::class.java)
+                                    .invoke(tileHost, -1, TILE_ID)
+                                module?.log("[Let Me Downgrade] Tile added to quick settings panel.")
+                            }
+                            catch (t: Throwable) {
+                                tileHostClass.getDeclaredMethod("addTile", String::class.java, Int::class.java)
+                                    .invoke(tileHost, TILE_ID, -1)
+                                module?.log("[Let Me Downgrade] Tile added to quick settings panel.")
+                            }
                         }
-
-                        module?.log("[Let Me Downgrade] Tile added to quick settings panel.")
                     }
 
                     return TileSetterHooker()
@@ -86,7 +98,7 @@ class SystemUIHooker {
                         @Suppress("UNCHECKED_CAST")
                         val tilesToReveal = XposedHelpers.getObjectField(XposedHelpers.getSurroundingThis(callback.thisObject),
                             "mTilesToReveal") as ArraySet<String>
-                        tilesToReveal.add(tileId)
+                        tilesToReveal.add(TILE_ID)
                         tileRevealed = true
                         module?.log("[Let Me Downgrade] Tile quick settings panel animation played. " +
                                 "Let Me Downgrade will not hook SystemUI on next reboot.")
