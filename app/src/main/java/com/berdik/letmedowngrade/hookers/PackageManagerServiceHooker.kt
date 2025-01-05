@@ -55,6 +55,15 @@ class PackageManagerServiceHooker {
                     classLoader.loadClass("android.content.pm.PackageInfoLite"))
             } catch (_: Exception) {}
 
+            // Android 15 QPR 1
+            try {
+                val pmClass = classLoader.loadClass("com.android.server.pm.PackageManagerServiceUtils")
+                return pmClass.getDeclaredMethod("checkDowngrade",
+                    Long::class.javaPrimitiveType, Int::class.javaPrimitiveType,
+                    Array<String>::class.java, IntArray::class.java,
+                    classLoader.loadClass("android.content.pm.PackageInfoLite"))
+            } catch (_: Exception) {}
+
             return null
         }
 
