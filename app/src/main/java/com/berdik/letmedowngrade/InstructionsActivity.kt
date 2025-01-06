@@ -7,6 +7,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.berdik.letmedowngrade.utils.PrefManager
+import com.berdik.letmedowngrade.utils.XposedChecker
 import com.mukesh.MarkDown
 import java.io.File
 
@@ -17,7 +19,11 @@ class InstructionsActivity : AppCompatActivity() {
 
         // Create a temporary file copy of the embedded instructions markdown file.
         val markdownSource: File = File.createTempFile(R.string.app_name.toString(), "tmp")
-        markdownSource.writeBytes(resources.openRawResource(R.raw.setup_instructions).readBytes())
+        PrefManager.loadPrefs()
+        if (XposedChecker.isEnabled())
+            markdownSource.writeBytes(resources.openRawResource(R.raw.module_loaded).readBytes())
+        else
+            markdownSource.writeBytes(resources.openRawResource(R.raw.setup_instructions).readBytes())
 
         // Load the temporary file copy of the instructions in the activity.
         findViewById<ComposeView>(R.id.instructions_md_renderer).apply {

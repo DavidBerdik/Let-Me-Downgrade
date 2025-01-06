@@ -7,7 +7,7 @@ import com.berdik.letmedowngrade.utils.PrefManager
 class QuickTile: TileService() {
     override fun onStartListening() {
         super.onStartListening()
-        PrefManager.loadPrefs(applicationContext)
+        PrefManager.loadPrefs()
         setButtonState()
     }
 
