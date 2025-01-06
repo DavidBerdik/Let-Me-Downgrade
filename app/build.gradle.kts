@@ -26,6 +26,11 @@ android {
         kotlinCompilerExtensionVersion = "1.5.3"
     }
 
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
