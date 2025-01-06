@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Let Me Downgrade</string>
-    <string name="xposed_description">Add support for downgrading apps on Android 12 through 14.</string>
+    <string name="xposed_description">Add support for downgrading apps on Android 12 through 15 QPR1.</string>
     <string name="tile_label">App Downgrades</string>
 </resources>
