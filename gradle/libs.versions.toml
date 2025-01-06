@@ -3,6 +3,7 @@ agp = "8.7.3"
 kotlin = "1.9.10"
 xposed-api = "100"
 xposed-service = "100-1.0.0"
+activity = "1.9.3"
 appcompat = "1.7.0"
 constraintlayout = "2.2.0"
 markdownview = "2.0.0"
@@ -12,6 +13,7 @@ agp-app = { id = "com.android.application", version.ref = "agp" }
 kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 
 [libraries]
+activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 markdownview = { group = "com.github.mukeshsolanki", name = "MarkdownView-Android", version.ref = "markdownview" }

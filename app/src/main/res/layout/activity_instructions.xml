@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/status_bar_background"
     tools:context=".InstructionsActivity">
 
     <androidx.compose.ui.platform.ComposeView
