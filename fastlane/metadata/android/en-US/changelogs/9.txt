@@ -1,0 +1,1 @@
+This release adds support for Android 15 QPR1 as well as in-app instructions for how to use the module after it has been enabled through LSPosed. For a full list of the changes in this release, please see the <a href='https://github.com/DavidBerdik/Let-Me-Downgrade/releases/tag/1.0.6' target='_blank' rel='nofollow'>release notes on GitHub</a>.
