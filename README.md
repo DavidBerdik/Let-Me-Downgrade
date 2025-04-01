@@ -6,15 +6,11 @@ Android's app installation system does not allow users to downgrade to an older 
 **⚠️ WARNING:** Let Me Downgrade is intended for rooted devices running Android 12 through 15 QPR1 and requires Xposed. The required Xposed variant to use is LSPosed. Other Xposed variants will not work. Additionally, this module cannot be guaranteed to work on all devices. In the worst case, it can cause a bootloop. Use at your own risk.
 
 <p align="center">
-  <a href="https://play.google.com/store/apps/details?id=com.berdik.letmedowngrade">
-    <img src="play-store-images/google-play-badge.png" height="80" />
-  </a>
-  <a href="https://f-droid.org/packages/com.berdik.letmedowngrade/">
-    <img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" height="80" />
-  </a>
-  <a href="https://github.com/DavidBerdik/Let-Me-Downgrade/releases">
-    <img src="play-store-images/badge_github.png" height="80" />
-  </a>
+  <a href="https://play.google.com/store/apps/details?id=com.berdik.letmedowngrade"><img src="play-store-images/google-play-badge.png" height="80" /></a>
+  <a href="https://f-droid.org/packages/com.berdik.letmedowngrade/"><img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" height="80" /></a>
+  <br />
+  <a href="https://apt.izzysoft.de/fdroid/index/apk/com.berdik.letmedowngrade"><img src="play-store-images/IzzyOnDroidButton.png" height="80" /></a>
+  <a href="https://github.com/DavidBerdik/Let-Me-Downgrade/releases"><img src="play-store-images/badge_github.png" height="80" /></a>
 </p>
 
 To use Let Me Downgrade:
