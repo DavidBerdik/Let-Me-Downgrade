@@ -1,11 +1,11 @@
 [versions]
-agp = "8.7.3"
+agp = "8.13.2"
 kotlin = "1.9.10"
 xposed-api = "100"
 xposed-service = "100-1.0.0"
-activity = "1.9.3"
-appcompat = "1.7.0"
-constraintlayout = "2.2.0"
+activity = "1.12.3"
+appcompat = "1.7.1"
+constraintlayout = "2.2.1"
 markdownview = "2.0.0"
 
 [plugins]
