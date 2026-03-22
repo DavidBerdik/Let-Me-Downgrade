@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/ic_launcher_background" />
+            <size
+                android:width="32dp"
+                android:height="32dp" />
+        </shape>
+    </item>
+    <item
+        android:width="32dp"
+        android:height="32dp">
+        <inset
+            android:inset="-8dp"
+            android:drawable="@drawable/ic_launcher_background_round" />
+    </item>
+    <item
+        android:width="32dp"
+        android:height="32dp"
+        android:gravity="center">
+        <inset
+            android:inset="-8dp"
+            android:drawable="@drawable/ic_launcher_foreground" />
+    </item>
+</layer-list>

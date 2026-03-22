@@ -8,11 +8,12 @@
         android:description="@string/xposed_description"
         android:theme="@style/Theme.AppCompat">
         <activity
-            android:name=".InstructionsActivity"
-            android:exported="true">
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

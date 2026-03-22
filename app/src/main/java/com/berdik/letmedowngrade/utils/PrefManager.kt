@@ -1,53 +1,56 @@
 package com.berdik.letmedowngrade.utils
 
+import android.annotation.SuppressLint
 import android.content.SharedPreferences
+import androidx.lifecycle.MutableLiveData
 import com.berdik.letmedowngrade.BuildConfig
 import io.github.libxposed.service.XposedService
 import io.github.libxposed.service.XposedServiceHelper
 
-class PrefManager {
-    companion object {
-        private var prefs: SharedPreferences? = null
-        private var hookActive: Boolean? = null
+object PrefManager {
+    private var prefs: SharedPreferences? = null
+    private val hookActiveLiveData = MutableLiveData<Boolean>()
 
-        fun loadPrefs() {
-            XposedServiceHelper.registerListener(object : XposedServiceHelper.OnServiceListener {
-                override fun onServiceBind(service: XposedService) {
-                    XposedChecker.flagAsEnabled()
-                    prefs = service.getRemotePreferences(BuildConfig.APPLICATION_ID)
-                }
-
-                override fun onServiceDied(service: XposedService) {}
-            })
-            markTileRevealAsDone()
-        }
-
-        fun isHookOn(): Boolean {
-            if (!XposedChecker.isEnabled()) {
-                return false
+    fun loadPrefs() {
+        XposedServiceHelper.registerListener(object : XposedServiceHelper.OnServiceListener {
+            override fun onServiceBind(service: XposedService) {
+                XposedChecker.flagAsEnabled()
+                prefs = service.getRemotePreferences(BuildConfig.APPLICATION_ID)
+                hookActiveLiveData.value = prefs!!.getBoolean("hookActive", false)
+                markTileRevealAsDone()
             }
 
-            if (hookActive == null) {
-                hookActive = prefs!!.getBoolean("hookActive", false)
-            }
-            return hookActive as Boolean
-        }
+            override fun onServiceDied(service: XposedService) {}
+        })
+    }
 
-        fun toggleHookState() {
-            if (XposedChecker.isEnabled()) {
-                hookActive = !isHookOn()
-                val prefEdit = prefs!!.edit()
-                prefEdit.putBoolean("hookActive", hookActive!!)
-                prefEdit.apply()
-            }
+    fun isHookOn(): Boolean {
+        if (!XposedChecker.isEnabled()) {
+            return false
         }
+        hookActiveLiveData.value?.let { return it }
+        return prefs?.getBoolean("hookActive", false) ?: false
+    }
 
-        private fun markTileRevealAsDone() {
-            if (XposedChecker.isEnabled()) {
-                val prefEdit = prefs!!.edit()
-                prefEdit.putBoolean("tileRevealDone", true)
-                prefEdit.apply()
-            }
+    fun toggleHookState() {
+        if (XposedChecker.isEnabled()) {
+            setHookState(!isHookOn())
         }
+    }
+
+    @SuppressLint("ApplySharedPref")
+    private fun setHookState(prefVal: Boolean) {
+        if (XposedChecker.isEnabled() && prefs != null) {
+            hookActiveLiveData.value = prefVal
+            prefs!!.edit().putBoolean("hookActive", prefVal).commit()
+        }
+    }
+
+    private fun markTileRevealAsDone() {
+        prefs?.edit()?.putBoolean("tileRevealDone", true)?.apply()
+    }
+
+    fun getHookActiveAsLiveData(): MutableLiveData<Boolean> {
+        return hookActiveLiveData
     }
 }

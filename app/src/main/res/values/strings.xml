@@ -3,4 +3,10 @@
     <string name="app_name">Let Me Downgrade</string>
     <string name="xposed_description">Add support for downgrading apps on Android 12 through 15 QPR1.</string>
     <string name="tile_label">App Downgrades</string>
+    <string name="status_title">Status</string>
+    <string name="status_icon_content_description">Status</string>
+    <string name="error_icon_content_description">Error</string>
+    <string name="module_disabled">Let Me Downgrade is not enabled. Please enable it in the LSPosed Manager, reboot your device, and try again.</string>
+    <string name="downgrade_status_enabled">App downgrades allowed</string>
+    <string name="downgrade_status_disabled">App downgrades blocked</string>
 </resources>
