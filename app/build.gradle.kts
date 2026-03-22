@@ -1,12 +1,12 @@
 plugins {
     alias(libs.plugins.agp.app)
-    alias(libs.plugins.kotlin)
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
     namespace = "com.berdik.letmedowngrade"
     compileSdk = 36
-    buildToolsVersion = "35.0.0"
+    buildToolsVersion = "36.0.0"
 
     defaultConfig {
         minSdk = 31
@@ -20,10 +20,6 @@ android {
         viewBinding = true
         compose = true
         buildConfig = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.3"
     }
 
     dependenciesInfo {
@@ -46,10 +42,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlin {
-        jvmToolchain(17)
-    }
-
     packaging {
         resources {
             merges += "META-INF/xposed/*"
@@ -61,6 +53,10 @@ android {
         abortOnError = true
         checkReleaseBuilds = true
     }
+}
+
+kotlin {
+    jvmToolchain(17)
 }
 
 dependencies {
