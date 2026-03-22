@@ -1,7 +1,7 @@
 # Let Me Downgrade
 <img align="left" src="play-store-images/ic_launcher-playstore.png" width="140" />
 
-Android's app installation system does not allow users to downgrade to an older version of an app when they already have a newer version installed. Let Me Downgrade is an Xposed module for Android 12 through 15 QPR1 that enables users to bypass this restriction. As an added bonus, Let Me Downgrade provides a Quick Settings tile to easily enable and disable the downgrade block.
+Android's app installation system does not allow users to downgrade to an older version of an app when they already have a newer version installed. Let Me Downgrade is an Xposed module for Android 12 through 16 QPR2 that enables users to bypass this restriction. As an added bonus, Let Me Downgrade provides a Quick Settings tile to easily enable and disable the downgrade block.
 
 **⚠️ WARNING:** Let Me Downgrade is intended for rooted devices running Android 12 through 16 QPR2 and requires Xposed. The required Xposed variant to use is LSPosed. Other Xposed variants will not work. Additionally, this module cannot be guaranteed to work on all devices. In the worst case, it can cause a bootloop. Use at your own risk.
 
