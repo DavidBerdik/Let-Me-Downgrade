@@ -6,7 +6,7 @@ xposed-service = "100-1.0.0"
 activity = "1.13.0"
 activity-compose = "1.13.0"
 appcompat = "1.7.1"
-compose = "1.10.5"
+compose = "1.10.6"
 compose-material3 = "1.4.0"
 
 [libraries]
