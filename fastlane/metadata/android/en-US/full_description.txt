@@ -1,4 +1,4 @@
-Android's app installation system does not allow users to downgrade to an older version of an app when they already have a newer version installed. <i>Let Me Downgrade</i> is an Xposed module for Android 12 through 16 QPR2 that enables users to bypass this restriction. As an added bonus, Let Me Downgrade provides a Quick Settings tile to easily enable and disable the downgrade block.
+Android's app installation system does not allow users to downgrade to an older version of an app when they already have a newer version installed. <i>Let Me Downgrade</i> is an Xposed module for Android 12 through 16 QPR2 that enables users to bypass this restriction. The app provides a Status screen with a switch to allow or block downgrades at any time. You can also add an optional App Downgrades Quick Settings tile that mirrors the same on/off state for quicker access.
 
 <b>⚠️ WARNING:</b> <i>Let Me Downgrade</i> is intended for rooted devices running Android 12 through 16 QPR2 and requires Xposed. The required Xposed variant to use is LSPosed. Other Xposed variants will not work. Additionally, this module cannot be guaranteed to work on all devices. In the worst case, it can cause a bootloop. Use at your own risk.
 
@@ -8,5 +8,5 @@ To use Let Me Downgrade:
 2. Install Let Me Downgrade.
 3. Activate the Let Me Downgrade module in the LSposed user interface.
 4. Reboot your device and sign in.
-5. Open the quick settings panel. The Let Me Downgrade tile will appear.
-6. Toggle the Let Me Downgrade tile on or off to enable or disable it.
+5. Open <i>Let Me Downgrade</i> from your launcher. When the module is active in LSPosed, the Status card shows whether app downgrades are allowed or blocked; use the switch to turn the hook on or off.
+6. Optionally, add the App Downgrades Quick Settings tile from the tile editor. The tile mirrors the in-app switch.

@@ -17,7 +17,6 @@ object PrefManager {
                 XposedChecker.flagAsEnabled()
                 prefs = service.getRemotePreferences(BuildConfig.APPLICATION_ID)
                 hookActiveLiveData.value = prefs!!.getBoolean("hookActive", false)
-                markTileRevealAsDone()
             }
 
             override fun onServiceDied(service: XposedService) {}
@@ -44,10 +43,6 @@ object PrefManager {
             hookActiveLiveData.value = prefVal
             prefs!!.edit().putBoolean("hookActive", prefVal).commit()
         }
-    }
-
-    private fun markTileRevealAsDone() {
-        prefs?.edit()?.putBoolean("tileRevealDone", true)?.apply()
     }
 
     fun getHookActiveAsLiveData(): MutableLiveData<Boolean> {
