@@ -28,8 +28,8 @@ class PackageManagerServiceHooker {
                     return@intercept null
                 }
 
-                val result = chain.proceed()
                 module.log(Log.INFO, TAG, "Allowed downgrade check on package: $packageName")
+                val result = chain.proceed()
                 result
             }
         }
