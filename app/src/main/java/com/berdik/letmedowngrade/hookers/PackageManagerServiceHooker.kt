@@ -72,7 +72,7 @@ class PackageManagerServiceHooker {
             companion object {
                 @JvmStatic
                 @BeforeInvocation
-                fun beforeInvocation(callback: BeforeHookCallback): DowngradeCheckerGenericHooker {
+                fun before(callback: BeforeHookCallback): DowngradeCheckerGenericHooker {
                     val prefs = module?.getRemotePreferences(BuildConfig.APPLICATION_ID)
                     val isHookActive = prefs?.getBoolean("hookActive", false)
                     val packageName = XposedHelpers.getObjectField(callback.args.last(), "packageName") as String
@@ -87,7 +87,7 @@ class PackageManagerServiceHooker {
 
                 @JvmStatic
                 @AfterInvocation
-                fun afterInvocation(callback: AfterHookCallback, context: DowngradeCheckerGenericHooker) {
+                fun after(callback: AfterHookCallback, context: DowngradeCheckerGenericHooker) {
                     if (!context.isHookActive) {
                         module?.log("[Let Me Downgrade] Allowed downgrade check on package: ${context.packageName}")
                     }
