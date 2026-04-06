@@ -1,25 +1,28 @@
 package com.berdik.letmedowngrade
 
+import android.util.Log
 import com.berdik.letmedowngrade.hookers.PackageManagerServiceHooker
-import io.github.libxposed.api.XposedInterface
 import io.github.libxposed.api.XposedModule
 import io.github.libxposed.api.XposedModuleInterface.ModuleLoadedParam
-import io.github.libxposed.api.XposedModuleInterface.SystemServerLoadedParam
+import io.github.libxposed.api.XposedModuleInterface.SystemServerStartingParam
 
 private lateinit var module: LetMeDowngrade
 
-class LetMeDowngrade(base: XposedInterface, param: ModuleLoadedParam) : XposedModule(base, param) {
-    init {
+const val TAG = "Let Me Downgrade"
+
+class LetMeDowngrade : XposedModule() {
+    override fun onModuleLoaded(param: ModuleLoadedParam) {
+        super.onModuleLoaded(param)
         module = this
     }
 
-    override fun onSystemServerLoaded(param: SystemServerLoadedParam) {
-        super.onSystemServerLoaded(param)
+    override fun onSystemServerStarting(param: SystemServerStartingParam) {
+        super.onSystemServerStarting(param)
 
         try {
-            PackageManagerServiceHooker.hook(param, module)
+            PackageManagerServiceHooker.hook(param, this)
         } catch (e: Exception) {
-            module.log("[Let Me Downgrade] ERROR: $e")
+            log(Log.ERROR, TAG, "ERROR: $e")
         }
     }
 }

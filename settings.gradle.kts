@@ -1,5 +1,3 @@
-import java.net.URI
-
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -13,9 +11,6 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven {
-            url = uri("https://jitpack.io")
-        }
         mavenLocal {
             content {
                 includeGroup("io.github.libxposed")

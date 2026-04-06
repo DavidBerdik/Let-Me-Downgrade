@@ -1,26 +1,37 @@
 package com.berdik.letmedowngrade.hookers
 
 import android.annotation.SuppressLint
+import android.util.Log
 import com.berdik.letmedowngrade.BuildConfig
+import com.berdik.letmedowngrade.TAG
 import com.berdik.letmedowngrade.utils.XposedHelpers
-import io.github.libxposed.api.XposedInterface
-import io.github.libxposed.api.XposedInterface.AfterHookCallback
-import io.github.libxposed.api.XposedInterface.BeforeHookCallback
 import io.github.libxposed.api.XposedModule
-import io.github.libxposed.api.XposedModuleInterface.SystemServerLoadedParam
-import io.github.libxposed.api.annotations.AfterInvocation
-import io.github.libxposed.api.annotations.BeforeInvocation
-import io.github.libxposed.api.annotations.XposedHooker
+import io.github.libxposed.api.XposedModuleInterface.SystemServerStartingParam
 import java.lang.reflect.Method
 
 class PackageManagerServiceHooker {
     companion object {
         var module: XposedModule? = null
+            private set
 
-        fun hook(param: SystemServerLoadedParam, module: XposedModule) {
+        fun hook(param: SystemServerStartingParam, module: XposedModule) {
             this.module = module
             val checkDowngradeMethod = findCheckDowngradeMethod(param.classLoader) as Method
-            module.hook(checkDowngradeMethod, DowngradeCheckerGenericHooker::class.java)
+
+            module.hook(checkDowngradeMethod).intercept { chain ->
+                val prefs = module.getRemotePreferences(BuildConfig.APPLICATION_ID)
+                val isHookActive = prefs.getBoolean("hookActive", false)
+                val packageName = XposedHelpers.getObjectField(chain.args.last(), "packageName") as String
+
+                if (isHookActive) {
+                    module.log(Log.INFO, TAG, "Blocked downgrade check on package: $packageName")
+                    return@intercept null
+                }
+
+                val result = chain.proceed()
+                module.log(Log.INFO, TAG, "Allowed downgrade check on package: $packageName")
+                result
+            }
         }
 
         @SuppressLint("PrivateApi")
@@ -65,34 +76,6 @@ class PackageManagerServiceHooker {
             } catch (_: Exception) {}
 
             return null
-        }
-
-        @XposedHooker
-        private class DowngradeCheckerGenericHooker(private val isHookActive: Boolean, private val packageName: String) : XposedInterface.Hooker {
-            companion object {
-                @JvmStatic
-                @BeforeInvocation
-                fun before(callback: BeforeHookCallback): DowngradeCheckerGenericHooker {
-                    val prefs = module?.getRemotePreferences(BuildConfig.APPLICATION_ID)
-                    val isHookActive = prefs?.getBoolean("hookActive", false)
-                    val packageName = XposedHelpers.getObjectField(callback.args.last(), "packageName") as String
-
-                    if (isHookActive!!) {
-                        module?.log("[Let Me Downgrade] Blocked downgrade check on package: $packageName")
-                        callback.returnAndSkip(null)
-                    }
-
-                    return DowngradeCheckerGenericHooker(isHookActive, packageName)
-                }
-
-                @JvmStatic
-                @AfterInvocation
-                fun after(callback: AfterHookCallback, context: DowngradeCheckerGenericHooker) {
-                    if (!context.isHookActive) {
-                        module?.log("[Let Me Downgrade] Allowed downgrade check on package: ${context.packageName}")
-                    }
-                }
-            }
         }
     }
 }
