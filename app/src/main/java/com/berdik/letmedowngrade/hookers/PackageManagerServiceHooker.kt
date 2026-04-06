@@ -8,9 +8,6 @@ import io.github.libxposed.api.XposedInterface.AfterHookCallback
 import io.github.libxposed.api.XposedInterface.BeforeHookCallback
 import io.github.libxposed.api.XposedModule
 import io.github.libxposed.api.XposedModuleInterface.SystemServerLoadedParam
-import io.github.libxposed.api.annotations.AfterInvocation
-import io.github.libxposed.api.annotations.BeforeInvocation
-import io.github.libxposed.api.annotations.XposedHooker
 import java.lang.reflect.Method
 
 class PackageManagerServiceHooker {
@@ -67,11 +64,9 @@ class PackageManagerServiceHooker {
             return null
         }
 
-        @XposedHooker
         private class DowngradeCheckerGenericHooker(private val isHookActive: Boolean, private val packageName: String) : XposedInterface.Hooker {
             companion object {
                 @JvmStatic
-                @BeforeInvocation
                 fun before(callback: BeforeHookCallback): DowngradeCheckerGenericHooker {
                     val prefs = module?.getRemotePreferences(BuildConfig.APPLICATION_ID)
                     val isHookActive = prefs?.getBoolean("hookActive", false)
@@ -86,7 +81,6 @@ class PackageManagerServiceHooker {
                 }
 
                 @JvmStatic
-                @AfterInvocation
                 fun after(callback: AfterHookCallback, context: DowngradeCheckerGenericHooker) {
                     if (!context.isHookActive) {
                         module?.log("[Let Me Downgrade] Allowed downgrade check on package: ${context.packageName}")
