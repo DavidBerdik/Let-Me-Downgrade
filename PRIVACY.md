@@ -25,7 +25,7 @@ The App does not integrate with any third-party services, advertising networks, 
 Let Me Downgrade is open-source software licensed under the AGPL-3.0 license. The complete source code is publicly available on GitHub. Anyone can independently review and audit the code to verify that no undocumented data collection or transmission occurs.
 
 ## 6. Children's Privacy
-Let Me Downgrade does not knowingly collect any personally identifiable information from children under the age of 13. Given the technical nature of the App — which requires a rooted device and an Xposed framework environment — it is not directed at or intended for use by children. 
+Let Me Downgrade does not knowingly collect any personally identifiable information from children under the age of 13. Given the technical nature of the App — which requires a rooted device and the LSPosed framework — it is not directed at or intended for use by children. If you believe a child has provided us with personal information, please contact us so it can be deleted.
 
 ## 7. Changes to This Privacy Policy
 We may update our Privacy Policy from time to time. Since the App collects no data, any changes will likely reflect updates to App functionality or new Google Play regulatory requirements. We will notify you of any changes by updating the "Effective Date" at the top of this policy and publishing the revised policy on our GitHub repository.
