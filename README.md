@@ -1,9 +1,9 @@
 # Let Me Downgrade
 <img align="left" src="play-store-images/ic_launcher-playstore.png" width="140" />
 
-Android's app installation system does not allow users to downgrade to an older version of an app when they already have a newer version installed. Let Me Downgrade is an Xposed module for Android 12 through 16 QPR2 that enables users to bypass this restriction. The app includes a Status screen with a switch to allow or block downgrades at any time. You can also add an optional App Downgrades Quick Settings tile that mirrors the same on/off state for quicker access.
+Android's app installation system does not allow users to downgrade to an older version of an app when they already have a newer version installed. Let Me Downgrade is an Xposed module for Android 12 through 17 that enables users to bypass this restriction. The app includes a Status screen with a switch to allow or block downgrades at any time. You can also add an optional App Downgrades Quick Settings tile that mirrors the same on/off state for quicker access.
 
-**⚠️ WARNING:** Let Me Downgrade is intended for rooted devices running Android 12 through 16 QPR2 and requires Xposed. The required Xposed variant to use is LSPosed. Other Xposed variants will not work. Additionally, this module cannot be guaranteed to work on all devices. In the worst case, it can cause a bootloop. Use at your own risk.
+**⚠️ WARNING:** Let Me Downgrade is intended for rooted devices running Android 12 through 17 and requires Xposed. The required Xposed variant to use is LSPosed. Other Xposed variants will not work. Additionally, this module cannot be guaranteed to work on all devices. In the worst case, it can cause a bootloop. Use at your own risk.
 
 <p align="center">
   <a href="https://play.google.com/store/apps/details?id=com.berdik.letmedowngrade"><img src="play-store-images/google-play-badge.png" height="80" /></a>
@@ -14,7 +14,7 @@ Android's app installation system does not allow users to downgrade to an older 
 </p>
 
 To use Let Me Downgrade:
-1. Install the [JingMatrix LSposed fork](https://github.com/JingMatrix/LSPosed). This requires your device to be rooted with Magisk or KernelSU. Installation instructions for LSPosed are available [here](https://github.com/JingMatrix/LSPosed?tab=readme-ov-file#install).
+1. Install an LSPosed build with API 101 support. This requires your device to be rooted with Magisk or KernelSU.
 2. Install Let Me Downgrade.
 3. Activate the Let Me Downgrade module in the LSposed user interface.
 

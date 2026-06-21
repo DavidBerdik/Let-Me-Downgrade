@@ -1,15 +1,20 @@
 package com.berdik.letmedowngrade.utils
 
+import android.os.Handler
+import android.os.Looper
+import androidx.compose.runtime.mutableStateOf
+
 class XposedChecker {
     companion object {
-        private var isEnabled = false
+        private val mainHandler = Handler(Looper.getMainLooper())
+        private val enabledState = mutableStateOf(false)
 
         fun flagAsEnabled() {
-            isEnabled = true
+            mainHandler.post { enabledState.value = true }
         }
 
         fun isEnabled(): Boolean {
-            return isEnabled
+            return enabledState.value
         }
     }
 }

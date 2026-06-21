@@ -1,1 +1,1 @@
-Add support for downgrading apps on Android 12 through 16 QPR2.
+Add support for downgrading apps on Android 12 through 17.

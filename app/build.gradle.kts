@@ -11,8 +11,8 @@ android {
     defaultConfig {
         minSdk = 31
         targetSdk = 36
-        versionCode = 10
-        versionName = "1.0.7"
+        versionCode = 11
+        versionName = "1.1.0"
         applicationId = "com.berdik.letmedowngrade"
     }
 

@@ -16,7 +16,7 @@ object PrefManager {
             override fun onServiceBind(service: XposedService) {
                 XposedChecker.flagAsEnabled()
                 prefs = service.getRemotePreferences(BuildConfig.APPLICATION_ID)
-                hookActiveLiveData.value = prefs!!.getBoolean("hookActive", false)
+                hookActiveLiveData.postValue(prefs!!.getBoolean("hookActive", false))
             }
 
             override fun onServiceDied(service: XposedService) {}
