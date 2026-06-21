@@ -1,0 +1,1 @@
+This release updates Let Me Downgrade to LSPosed API 101. An LSPosed build with API 101 support is required; this version is not compatible with API 100-only frameworks.
