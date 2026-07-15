@@ -5,7 +5,6 @@
     <string name="tile_label">App Downgrades</string>
     <string name="signature_tile_label">Signature Verification</string>
     <string name="status_title">Status</string>
-    <string name="signature_status_title">Signature Verification</string>
     <string name="status_icon_content_description">Status</string>
     <string name="error_icon_content_description">Error</string>
     <string name="module_disabled">Let Me Downgrade is not enabled. Please enable it in the LSPosed Manager, reboot your device, and try again.</string>
