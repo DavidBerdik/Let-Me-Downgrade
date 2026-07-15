@@ -52,6 +52,7 @@ import com.berdik.letmedowngrade.utils.XposedChecker
 class MainActivity : ComponentActivity() {
 
     private lateinit var isHookSwitchOn: MutableState<Boolean>
+    private lateinit var isSignatureBypassSwitchOn: MutableState<Boolean>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -59,9 +60,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         PrefManager.loadPrefs()
         isHookSwitchOn = mutableStateOf(PrefManager.isHookOn())
+        isSignatureBypassSwitchOn = mutableStateOf(PrefManager.isSignatureBypassOn())
         PrefManager.getHookActiveAsLiveData().observe(this) { isActive ->
             isActive?.let {
                 isHookSwitchOn.value = it
+            }
+        }
+        PrefManager.getSignatureBypassActiveAsLiveData().observe(this) { isActive ->
+            isActive?.let {
+                isSignatureBypassSwitchOn.value = it
             }
         }
 
@@ -114,13 +121,16 @@ class MainActivity : ComponentActivity() {
                 verticalArrangement = Arrangement.spacedBy(20.dp),
                 horizontalAlignment = Alignment.Start
             ) {
-                StatusCard(isHookSwitchOn)
+                StatusCard(isHookSwitchOn, isSignatureBypassSwitchOn)
             }
         }
     }
 
     @Composable
-    fun StatusCard(isHookSwitchOn: MutableState<Boolean>) {
+    fun StatusCard(
+        isHookSwitchOn: MutableState<Boolean>,
+        isSignatureBypassSwitchOn: MutableState<Boolean>
+    ) {
         OutlinedCard(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Row(
@@ -154,28 +164,49 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.padding(10.dp)
                     )
                 } else {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = if (isHookSwitchOn.value) {
-                                stringResource(R.string.downgrade_status_enabled)
-                            } else {
-                                stringResource(R.string.downgrade_status_disabled)
-                            },
-                            fontSize = 16.sp,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Switch(
-                            checked = isHookSwitchOn.value,
-                            onCheckedChange = { PrefManager.toggleHookState() },
-                            modifier = Modifier.padding(10.dp)
-                        )
-                    }
+                    SettingRow(
+                        enabledText = stringResource(R.string.downgrade_status_enabled),
+                        disabledText = stringResource(R.string.downgrade_status_disabled),
+                        isSwitchOn = isHookSwitchOn,
+                        onToggle = { PrefManager.toggleHookState() }
+                    )
+                    SettingRow(
+                        enabledText = stringResource(R.string.signature_status_enabled),
+                        disabledText = stringResource(R.string.signature_status_disabled),
+                        isSwitchOn = isSignatureBypassSwitchOn,
+                        onToggle = { PrefManager.toggleSignatureBypassState() }
+                    )
                 }
             }
+        }
+    }
+
+    @Composable
+    private fun SettingRow(
+        enabledText: String,
+        disabledText: String,
+        isSwitchOn: MutableState<Boolean>,
+        onToggle: () -> Unit
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = if (isSwitchOn.value) {
+                    enabledText
+                } else {
+                    disabledText
+                },
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Switch(
+                checked = isSwitchOn.value,
+                onCheckedChange = { onToggle() },
+                modifier = Modifier.padding(10.dp)
+            )
         }
     }
 

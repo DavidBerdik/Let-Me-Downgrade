@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Let Me Downgrade</string>
-    <string name="xposed_description">Add support for downgrading apps on Android 12 through 17.</string>
+    <string name="xposed_description">Add support for downgrading apps and disabling signature verification on Android 12 through 17.</string>
     <string name="tile_label">App Downgrades</string>
+    <string name="signature_tile_label">Signature Verification</string>
     <string name="status_title">Status</string>
     <string name="status_icon_content_description">Status</string>
     <string name="error_icon_content_description">Error</string>
     <string name="module_disabled">Let Me Downgrade is not enabled. Please enable it in the LSPosed Manager, reboot your device, and try again.</string>
     <string name="downgrade_status_enabled">App downgrades allowed</string>
     <string name="downgrade_status_disabled">App downgrades blocked</string>
+    <string name="signature_status_enabled">Signature verification disabled</string>
+    <string name="signature_status_disabled">Signature verification enabled</string>
 </resources>
