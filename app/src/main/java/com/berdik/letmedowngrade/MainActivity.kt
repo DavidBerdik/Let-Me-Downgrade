@@ -52,6 +52,7 @@ import com.berdik.letmedowngrade.utils.XposedChecker
 class MainActivity : ComponentActivity() {
 
     private lateinit var isHookSwitchOn: MutableState<Boolean>
+    private lateinit var isSignatureBypassSwitchOn: MutableState<Boolean>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
@@ -59,9 +60,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         PrefManager.loadPrefs()
         isHookSwitchOn = mutableStateOf(PrefManager.isHookOn())
+        isSignatureBypassSwitchOn = mutableStateOf(PrefManager.isSignatureBypassOn())
         PrefManager.getHookActiveAsLiveData().observe(this) { isActive ->
             isActive?.let {
                 isHookSwitchOn.value = it
+            }
+        }
+        PrefManager.getSignatureBypassActiveAsLiveData().observe(this) { isActive ->
+            isActive?.let {
+                isSignatureBypassSwitchOn.value = it
             }
         }
 
@@ -114,63 +121,87 @@ class MainActivity : ComponentActivity() {
                 verticalArrangement = Arrangement.spacedBy(20.dp),
                 horizontalAlignment = Alignment.Start
             ) {
-                StatusCard(isHookSwitchOn)
+                if (!XposedChecker.isEnabled()) {
+                    OutlinedCard(modifier = Modifier.fillMaxWidth()) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            modifier = Modifier.padding(16.dp)
+                        ) {
+                            Icon(
+                                painterResource(R.drawable.error_24),
+                                contentDescription = stringResource(R.string.error_icon_content_description)
+                            )
+                            Text(
+                                text = stringResource(R.string.module_disabled),
+                                fontSize = 20.sp,
+                                textAlign = TextAlign.Start,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+                }
+                StatusCard(
+                    title = stringResource(R.string.status_title),
+                    enabledText = stringResource(R.string.downgrade_status_enabled),
+                    disabledText = stringResource(R.string.downgrade_status_disabled),
+                    isSwitchOn = isHookSwitchOn,
+                    onToggle = { PrefManager.toggleHookState() }
+                )
+                StatusCard(
+                    title = stringResource(R.string.signature_status_title),
+                    enabledText = stringResource(R.string.signature_status_enabled),
+                    disabledText = stringResource(R.string.signature_status_disabled),
+                    isSwitchOn = isSignatureBypassSwitchOn,
+                    onToggle = { PrefManager.toggleSignatureBypassState() }
+                )
             }
         }
     }
 
     @Composable
-    fun StatusCard(isHookSwitchOn: MutableState<Boolean>) {
+    fun StatusCard(
+        title: String,
+        enabledText: String,
+        disabledText: String,
+        isSwitchOn: MutableState<Boolean>,
+        onToggle: () -> Unit
+    ) {
         OutlinedCard(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    if (XposedChecker.isEnabled()) {
-                        Icon(
-                            painterResource(R.drawable.checklist_24),
-                            contentDescription = stringResource(R.string.status_icon_content_description)
-                        )
-                    } else {
-                        Icon(
-                            painterResource(R.drawable.error_24),
-                            contentDescription = stringResource(R.string.error_icon_content_description)
-                        )
-                    }
+                    Icon(
+                        painterResource(R.drawable.checklist_24),
+                        contentDescription = stringResource(R.string.status_icon_content_description)
+                    )
                     Text(
-                        text = stringResource(R.string.status_title),
+                        text = title,
                         fontSize = 24.sp,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 }
 
-                if (!XposedChecker.isEnabled()) {
-                    Text(
-                        text = stringResource(R.string.module_disabled),
-                        fontSize = 20.sp,
-                        textAlign = TextAlign.Start,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.padding(10.dp)
-                    )
-                } else {
+                if (XposedChecker.isEnabled()) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            text = if (isHookSwitchOn.value) {
-                                stringResource(R.string.downgrade_status_enabled)
+                            text = if (isSwitchOn.value) {
+                                enabledText
                             } else {
-                                stringResource(R.string.downgrade_status_disabled)
+                                disabledText
                             },
                             fontSize = 16.sp,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Switch(
-                            checked = isHookSwitchOn.value,
-                            onCheckedChange = { PrefManager.toggleHookState() },
+                            checked = isSwitchOn.value,
+                            onCheckedChange = { onToggle() },
                             modifier = Modifier.padding(10.dp)
                         )
                     }
