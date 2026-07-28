@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Let Me Downgrade</string>
+    <string name="xposed_description">Android 12 から 17 の環境でアプリのダウングレードの対応を追加します。</string>
+    <string name="tile_label">アプリダウングレーダー</string>
+    <string name="status_title">ステータス</string>
+    <string name="status_icon_content_description">ステータス</string>
+    <string name="error_icon_content_description">エラー</string>
+    <string name="module_disabled">Let Me Downgrade は有効化されていません。LSPosed Manager で有効化後にデバイスを再起動してから再度お試しください。</string>
+    <string name="downgrade_status_enabled">ダウングレードは許可されています</string>
+    <string name="downgrade_status_disabled">ダウングレードはブロックされています</string>
+</resources>
