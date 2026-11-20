@@ -38,12 +38,7 @@ class SignatureVerificationHooker {
 
             hookSigningDetails(classLoader, module)
             hookStrictJarVerifier(classLoader, module)
-            hookPackageManagerServiceUtils(classLoader, module)
             hookKeySetManagerService(classLoader, module)
-            hookMessageDigest(classLoader, module)
-            hookApkSigningBlockUtils(classLoader, module)
-            hookApkSignatureVerifier(classLoader, module)
-            hookScanPackageUtils(classLoader, module)
         }
 
         private fun isBypassActive(module: XposedModule): Boolean {
@@ -89,74 +84,12 @@ class SignatureVerificationHooker {
             } catch (e: Exception) {
                 module.log(Log.ERROR, TAG, "Failed to hook checkCapabilityRecover: $e")
             }
-
-            try {
-                val signaturesMatchExactlyMethod = signingDetailsClass.getDeclaredMethod(
-                    "signaturesMatchExactly", signingDetailsClass
-                )
-                module.hook(signaturesMatchExactlyMethod).intercept { chain ->
-                    if (isBypassActive(module)) {
-                        module.log(Log.INFO, TAG, "Bypassed signaturesMatchExactly")
-                        return@intercept true
-                    }
-                    chain.proceed()
-                }
-            } catch (e: Exception) {
-                module.log(Log.ERROR, TAG, "Failed to hook signaturesMatchExactly: $e")
-            }
-
-            try {
-                val hasCommonAncestorMethod = signingDetailsClass.getDeclaredMethod(
-                    "hasCommonAncestor", signingDetailsClass
-                )
-                module.hook(hasCommonAncestorMethod).intercept { chain ->
-                    if (isBypassActive(module) && isCalledFromVerifySignatures()) {
-                        module.log(Log.INFO, TAG, "Bypassed hasCommonAncestor")
-                        return@intercept true
-                    }
-                    chain.proceed()
-                }
-            } catch (_: Exception) {}
         }
 
         @SuppressLint("PrivateApi")
         private fun hookStrictJarVerifier(classLoader: ClassLoader, module: XposedModule) {
             try {
                 val strictJarVerifierClass = classLoader.loadClass("android.util.jar.StrictJarVerifier")
-
-                val verifyMessageDigestMethod = strictJarVerifierClass.declaredMethods.first { method ->
-                    method.name == "verifyMessageDigest" && method.returnType == Boolean::class.javaPrimitiveType
-                }
-                module.hook(verifyMessageDigestMethod).intercept { chain ->
-                    if (isBypassActive(module)) {
-                        return@intercept true
-                    }
-                    chain.proceed()
-                }
-
-                val verifyMethod = strictJarVerifierClass.declaredMethods.first { method ->
-                    method.name == "verify" && method.returnType == Boolean::class.javaPrimitiveType
-                }
-                module.hook(verifyMethod).intercept { chain ->
-                    if (isBypassActive(module)) {
-                        return@intercept true
-                    }
-                    chain.proceed()
-                }
-
-                val constructor = strictJarVerifierClass.declaredConstructors.first()
-                val rollbackField = strictJarVerifierClass.declaredFields.first { field ->
-                    field.name == "signatureSchemeRollbackProtectionsEnforced"
-                }
-                rollbackField.isAccessible = true
-                module.hook(constructor).intercept { chain ->
-                    val result = chain.proceed()
-                    if (isBypassActive(module)) {
-                        rollbackField.set(chain.thisObject, false)
-                    }
-                    result
-                }
-
                 hookVerifyBytes(classLoader, module, strictJarVerifierClass)
             } catch (e: Exception) {
                 module.log(Log.ERROR, TAG, "Failed to hook StrictJarVerifier: $e")
@@ -204,26 +137,6 @@ class SignatureVerificationHooker {
         }
 
         @SuppressLint("PrivateApi")
-        private fun hookPackageManagerServiceUtils(classLoader: ClassLoader, module: XposedModule) {
-            try {
-                val utilsClass = classLoader.loadClass("com.android.server.pm.PackageManagerServiceUtils")
-                val verifySignaturesMethod = utilsClass.declaredMethods.first { method ->
-                    method.name == "verifySignatures" && method.returnType == Boolean::class.javaPrimitiveType
-                }
-                module.deoptimize(verifySignaturesMethod)
-                module.hook(verifySignaturesMethod).intercept { chain ->
-                    if (isBypassActive(module)) {
-                        module.log(Log.INFO, TAG, "Bypassed verifySignatures")
-                        return@intercept false
-                    }
-                    chain.proceed()
-                }
-            } catch (e: Exception) {
-                module.log(Log.ERROR, TAG, "Failed to hook verifySignatures: $e")
-            }
-        }
-
-        @SuppressLint("PrivateApi")
         private fun hookKeySetManagerService(classLoader: ClassLoader, module: XposedModule) {
             try {
                 val keySetClass = classLoader.loadClass("com.android.server.pm.KeySetManagerService")
@@ -256,87 +169,6 @@ class SignatureVerificationHooker {
             }
         }
 
-        private fun hookMessageDigest(classLoader: ClassLoader, module: XposedModule) {
-            try {
-                val messageDigestClass = classLoader.loadClass("java.security.MessageDigest")
-                val isEqualMethod = messageDigestClass.getDeclaredMethod(
-                    "isEqual", ByteArray::class.java, ByteArray::class.java
-                )
-                module.hook(isEqualMethod).intercept { chain ->
-                    if (isBypassActive(module)) {
-                        return@intercept true
-                    }
-                    chain.proceed()
-                }
-            } catch (e: Exception) {
-                module.log(Log.ERROR, TAG, "Failed to hook MessageDigest.isEqual: $e")
-            }
-        }
-
-        @SuppressLint("PrivateApi")
-        private fun hookApkSigningBlockUtils(classLoader: ClassLoader, module: XposedModule) {
-            try {
-                val utilsClass = classLoader.loadClass("android.util.apk.ApkSigningBlockUtils")
-
-                val parseVerityMethod = utilsClass.declaredMethods.first { method ->
-                    method.name == "parseVerityDigestAndVerifySourceLength"
-                }
-                module.hook(parseVerityMethod).intercept { chain ->
-                    if (isBypassActive(module)) {
-                        val digest = chain.args[0] as ByteArray
-                        return@intercept digest.copyOfRange(0, minOf(32, digest.size))
-                    }
-                    chain.proceed()
-                }
-
-                val verifyIntegrityMethod = utilsClass.declaredMethods.first { method ->
-                    method.name == "verifyIntegrityForVerityBasedAlgorithm"
-                }
-                module.hook(verifyIntegrityMethod).intercept { chain ->
-                    if (isBypassActive(module)) {
-                        return@intercept null
-                    }
-                    chain.proceed()
-                }
-            } catch (e: Exception) {
-                module.log(Log.ERROR, TAG, "Failed to hook ApkSigningBlockUtils: $e")
-            }
-        }
-
-        @SuppressLint("PrivateApi")
-        private fun hookApkSignatureVerifier(classLoader: ClassLoader, module: XposedModule) {
-            try {
-                val verifierClass = classLoader.loadClass("android.util.apk.ApkSignatureVerifier")
-                val getMinSchemeMethod = verifierClass.getDeclaredMethod(
-                    "getMinimumSignatureSchemeVersionForTargetSdk", Int::class.javaPrimitiveType
-                )
-                module.hook(getMinSchemeMethod).intercept { chain ->
-                    if (isBypassActive(module)) {
-                        return@intercept 0
-                    }
-                    chain.proceed()
-                }
-            } catch (e: Exception) {
-                module.log(Log.ERROR, TAG, "Failed to hook ApkSignatureVerifier: $e")
-            }
-        }
-
-        @SuppressLint("PrivateApi")
-        private fun hookScanPackageUtils(classLoader: ClassLoader, module: XposedModule) {
-            try {
-                val scanUtilsClass = classLoader.loadClass("com.android.server.pm.ScanPackageUtils")
-                val assertMethod = scanUtilsClass.declaredMethods.first { method ->
-                    method.name == "assertMinSignatureSchemeIsValid"
-                }
-                module.hook(assertMethod).intercept { chain ->
-                    if (isBypassActive(module)) {
-                        return@intercept null
-                    }
-                    chain.proceed()
-                }
-            } catch (_: Exception) {}
-        }
-
         @SuppressLint("PrivateApi")
         private fun findSigningDetailsClass(classLoader: ClassLoader): Class<*>? {
             try {
@@ -348,11 +180,6 @@ class SignatureVerificationHooker {
             } catch (_: Exception) {}
 
             return null
-        }
-
-        private fun isCalledFromVerifySignatures(): Boolean {
-            return Arrays.stream(Thread.currentThread().stackTrace)
-                .anyMatch { element -> element.methodName == "verifySignatures" }
         }
 
         private fun isCalledFromInstallFlow(): Boolean {
