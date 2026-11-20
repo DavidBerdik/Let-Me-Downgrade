@@ -96,7 +96,7 @@ class SignatureVerificationHooker {
             }
         }
 
-        @SuppressLint("PrivateApi")
+        @SuppressLint("PrivateApi", "DiscouragedPrivateApi")
         private fun hookVerifyBytes(
             classLoader: ClassLoader,
             module: XposedModule,
