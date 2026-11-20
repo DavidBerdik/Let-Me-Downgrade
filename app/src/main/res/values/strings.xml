@@ -3,7 +3,7 @@
     <string name="app_name">Let Me Downgrade</string>
     <string name="xposed_description">Add support for downgrading apps and disabling signature verification on Android 12 through 17.</string>
     <string name="tile_label">App Downgrades</string>
-    <string name="signature_tile_label">Signature Verification</string>
+    <string name="signature_tile_label">Block App Signature Verification</string>
     <string name="status_title">Status</string>
     <string name="status_icon_content_description">Status</string>
     <string name="error_icon_content_description">Error</string>
