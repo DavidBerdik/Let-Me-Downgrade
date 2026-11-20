@@ -133,6 +133,10 @@ class SignatureVerificationHooker {
             hooker: XposedInterface.Hooker,
         ) {
             val builder = module.hook(method)
+            /*
+                setId is API 102-only; on API 101 frameworks the compile-time API is still 102 but
+                getApiVersion() returns the framework LIB_API so this guard is a real 101/102 split.
+             */
             if (module.apiVersion >= XposedInterface.API_102) {
                 builder.setId(id)
             }
