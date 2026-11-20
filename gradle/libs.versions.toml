@@ -1,13 +1,13 @@
 [versions]
 agp = "9.5.1"
-kotlin = "2.4.0"
+kotlin = "2.4.21"
 xposed-api = "102.0.0"
 xposed-service = "102.0.0"
 activity = "1.13.0"
 activity-compose = "1.13.0"
-appcompat = "1.7.1"
-compose = "1.11.3"
-compose-material3 = "1.4.0"
+appcompat = "1.8.0"
+compose = "1.13.0"
+compose-material3 = "1.5.0"
 
 [libraries]
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
