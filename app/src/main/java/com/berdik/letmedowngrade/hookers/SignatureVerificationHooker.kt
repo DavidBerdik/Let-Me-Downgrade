@@ -38,20 +38,6 @@ class SignatureVerificationHooker {
                 .getBoolean(PREF_KEY, false)
         }
 
-        private fun extractPackageName(pkgSetting: Any): String {
-            try {
-                return pkgSetting.javaClass.getMethod("getPackageName").invoke(pkgSetting) as String
-            } catch (_: Exception) {
-            }
-
-            try {
-                return pkgSetting.javaClass.getMethod("getName").invoke(pkgSetting) as String
-            } catch (_: Exception) {
-            }
-
-            return "unknown"
-        }
-
         private fun hookSigningDetails(classLoader: ClassLoader, module: XposedModule) {
             val signingDetailsClass = findSigningDetailsClass(classLoader) ?: return
 
@@ -63,6 +49,7 @@ class SignatureVerificationHooker {
                     if (isBypassActive(module)) {
                         val flags = chain.args[1] as Int
                         if (flags != PERMISSION_CAPABILITY && flags != AUTH_CAPABILITY) {
+                            module.log(Log.INFO, TAG, "Bypassed checkCapability")
                             return@intercept true
                         }
                     }
@@ -80,6 +67,7 @@ class SignatureVerificationHooker {
                     if (isBypassActive(module)) {
                         val flags = chain.args[1] as Int
                         if (flags != PERMISSION_CAPABILITY && flags != AUTH_CAPABILITY) {
+                            module.log(Log.INFO, TAG, "Bypassed checkCapabilityRecover")
                             return@intercept true
                         }
                     }
@@ -95,6 +83,7 @@ class SignatureVerificationHooker {
                 )
                 module.hook(signaturesMatchExactlyMethod).intercept { chain ->
                     if (isBypassActive(module)) {
+                        module.log(Log.INFO, TAG, "Bypassed signaturesMatchExactly")
                         return@intercept true
                     }
                     chain.proceed()
@@ -109,6 +98,7 @@ class SignatureVerificationHooker {
                 )
                 module.hook(hasCommonAncestorMethod).intercept { chain ->
                     if (isBypassActive(module) && isCalledFromVerifySignatures()) {
+                        module.log(Log.INFO, TAG, "Bypassed hasCommonAncestor")
                         return@intercept true
                     }
                     chain.proceed()
@@ -209,14 +199,10 @@ class SignatureVerificationHooker {
                 }
                 module.deoptimize(verifySignaturesMethod)
                 module.hook(verifySignaturesMethod).intercept { chain ->
-                    val packageName = extractPackageName(chain.args[0])
-
                     if (isBypassActive(module)) {
-                        module.log(Log.INFO, TAG, "Blocked signature verification on package: $packageName")
+                        module.log(Log.INFO, TAG, "Bypassed verifySignatures")
                         return@intercept false
                     }
-
-                    module.log(Log.INFO, TAG, "Allowed signature verification on package: $packageName")
                     chain.proceed()
                 }
             } catch (e: Exception) {
