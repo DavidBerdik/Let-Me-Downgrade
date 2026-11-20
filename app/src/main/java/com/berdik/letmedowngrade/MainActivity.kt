@@ -200,12 +200,14 @@ class MainActivity : ComponentActivity() {
                     disabledText
                 },
                 fontSize = 16.sp,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 8.dp)
             )
             Switch(
                 checked = isSwitchOn.value,
                 onCheckedChange = { onToggle() },
-                modifier = Modifier.padding(10.dp)
             )
         }
     }
