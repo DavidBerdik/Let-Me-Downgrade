@@ -31,9 +31,9 @@ To use Let Me Downgrade:
 
 5. Open Let Me Downgrade from your launcher. When the module is active in LSPosed, the Status card shows whether app downgrades are allowed or blocked; use the switch to turn the hook on or off.
 
-On LSPosed API 102, updating the Let Me Downgrade APK can reload the module hooks without a reboot (first-time activation still requires a reboot). On API 101, reboot after updating the module APK.
+6. On LSPosed API 102, updating the Let Me Downgrade APK can reload the module hooks without a reboot (first-time activation still requires a reboot). On API 101, reboot after updating the module APK.
 
-6. Optionally, add the App Downgrades Quick Settings tile from the tile editor. The tile mirrors the in-app switch.
+7. Optionally, add the App Downgrades Quick Settings tile from the tile editor. The tile mirrors the in-app switch.
 
 <p align="center">
   <img src="play-store-images/screenshots/4.png" width="300" />
