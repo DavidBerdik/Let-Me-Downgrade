@@ -60,6 +60,9 @@ class SignatureVerificationHooker {
         ): Set<XposedInterface.HookHandle> {
             this.module = module
             val claimed = mutableSetOf<XposedInterface.HookHandle>()
+            if (module.apiVersion < XposedInterface.API_102) {
+                return claimed
+            }
             val presentIds = mutableSetOf<String>()
 
             for (handle in oldHandles) {

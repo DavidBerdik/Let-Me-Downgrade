@@ -55,6 +55,9 @@ class PackageManagerServiceHooker {
         ): Set<XposedInterface.HookHandle> {
             this.module = module
             val claimed = mutableSetOf<XposedInterface.HookHandle>()
+            if (module.apiVersion < XposedInterface.API_102) {
+                return claimed
+            }
             var hasCheckDowngrade = false
             for (handle in oldHandles) {
                 val id = handle.id ?: handle.executable.name
