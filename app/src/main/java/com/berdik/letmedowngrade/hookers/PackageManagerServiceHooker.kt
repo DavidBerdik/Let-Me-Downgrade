@@ -15,6 +15,8 @@ class PackageManagerServiceHooker {
         var module: XposedModule? = null
             private set
 
+        private const val HOOK_ID = "checkDowngrade"
+
         fun hook(param: SystemServerStartingParam, module: XposedModule) {
             this.module = module
             val checkDowngradeMethod = findCheckDowngradeMethod(param.classLoader) as Method
@@ -46,8 +48,6 @@ class PackageManagerServiceHooker {
                     }
                 }
             }
-
-        private const val HOOK_ID = "checkDowngrade"
 
         fun replaceHooks(
             oldHandles: List<XposedInterface.HookHandle>,
