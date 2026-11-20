@@ -176,7 +176,7 @@ class SignatureVerificationHooker {
             } catch (_: Exception) {}
 
             try {
-                return classLoader.loadClass("android.content.pm.PackageParser\$SigningDetails")
+                return classLoader.loadClass($$"android.content.pm.PackageParser$SigningDetails")
             } catch (_: Exception) {}
 
             return null
