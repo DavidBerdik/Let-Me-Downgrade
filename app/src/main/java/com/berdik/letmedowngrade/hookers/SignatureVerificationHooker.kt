@@ -11,6 +11,14 @@ import java.util.Arrays
 class SignatureVerificationHooker {
     companion object {
         private const val PREF_KEY = "signatureBypassActive"
+
+        /*
+         * SigningDetails.CertCapabilities values passed as the flags argument to checkCapability
+         * and checkCapabilityRecover. When the bypass is on, those hooks still run the real check
+         * for these flags so install-time signature skipping does not weaken permission- or
+         * auth-related signing checks. On Android 12, 4 is PERMISSION; on Android 13+, 4 is
+         * SHARED_USER_ID and PERMISSION is 8 — we exclude 4 and 16 on all supported versions.
+         */
         private const val PERMISSION_CAPABILITY = 4
         private const val AUTH_CAPABILITY = 16
 
