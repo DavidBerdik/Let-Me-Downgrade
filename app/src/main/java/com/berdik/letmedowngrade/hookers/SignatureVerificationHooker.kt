@@ -25,6 +25,11 @@ class SignatureVerificationHooker {
         var module: XposedModule? = null
             private set
 
+        /*
+         * Per-install-thread flag coordinating KeySetManagerService hooks: shouldCheckUpgradeKeySetLocked
+         * sets this when bypassing during an install flow so checkUpgradeKeySetLocked can short-circuit
+         * only on that same thread. ThreadLocal avoids leaking bypass state across concurrent installs.
+         */
         private val keySetBypass = ThreadLocal<Boolean>()
 
         fun hook(param: SystemServerStartingParam, module: XposedModule) {
