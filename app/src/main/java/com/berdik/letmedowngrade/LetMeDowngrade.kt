@@ -3,6 +3,7 @@ package com.berdik.letmedowngrade
 import android.util.Log
 import com.berdik.letmedowngrade.hookers.PackageManagerServiceHooker
 import com.berdik.letmedowngrade.hookers.SignatureVerificationHooker
+import io.github.libxposed.api.XposedInterface
 import io.github.libxposed.api.XposedModule
 import io.github.libxposed.api.XposedModuleInterface.HotReloadedParam
 import io.github.libxposed.api.XposedModuleInterface.HotReloadingParam
@@ -39,6 +40,7 @@ class LetMeDowngrade : XposedModule() {
             Returning false would make autoHotReload a no-op; the default would also block reload.
          */
         PackageManagerServiceHooker.clearModuleRef()
+        SignatureVerificationHooker.clearModuleRef()
         return true
     }
 
@@ -52,7 +54,16 @@ class LetMeDowngrade : XposedModule() {
                 log(Log.ERROR, TAG, "ERROR: hot reload delivered no hook handles to replace")
                 return
             }
-            PackageManagerServiceHooker.replaceHooks(param.oldHookHandles, this)
+            val handles = param.oldHookHandles
+            val claimed = mutableSetOf<XposedInterface.HookHandle>()
+            claimed.addAll(PackageManagerServiceHooker.replaceHooks(handles, this))
+            claimed.addAll(SignatureVerificationHooker.replaceHooks(handles, this))
+            for (handle in handles) {
+                if (handle !in claimed) {
+                    log(Log.WARN, TAG, "Unhooking stale handle: ${handle.id ?: handle.executable.name}")
+                    handle.unhook()
+                }
+            }
         } catch (e: Exception) {
             log(Log.ERROR, TAG, "ERROR: $e")
         }

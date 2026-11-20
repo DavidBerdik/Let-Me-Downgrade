@@ -24,7 +24,7 @@ class PackageManagerServiceHooker {
                 getApiVersion() returns the framework LIB_API so this guard is a real 101/102 split.
              */
             if (module.apiVersion >= XposedInterface.API_102) {
-                builder.setId("checkDowngrade")
+                builder.setId(HOOK_ID)
             }
             builder.intercept(createCheckDowngradeHooker(module))
         }
@@ -47,12 +47,35 @@ class PackageManagerServiceHooker {
                 }
             }
 
-        fun replaceHooks(oldHandles: List<XposedInterface.HookHandle>, module: XposedModule) {
+        private const val HOOK_ID = "checkDowngrade"
+
+        fun replaceHooks(
+            oldHandles: List<XposedInterface.HookHandle>,
+            module: XposedModule
+        ): Set<XposedInterface.HookHandle> {
             this.module = module
-            val hooker = createCheckDowngradeHooker(module)
+            val claimed = mutableSetOf<XposedInterface.HookHandle>()
+            var hasCheckDowngrade = false
             for (handle in oldHandles) {
-                handle.replaceHook(hooker)
+                val id = handle.id ?: handle.executable.name
+                if (id != HOOK_ID) {
+                    continue
+                }
+                handle.replaceHook(createCheckDowngradeHooker(module))
+                claimed.add(handle)
+                hasCheckDowngrade = true
             }
+            if (!hasCheckDowngrade && oldHandles.isNotEmpty()) {
+                val classLoader = oldHandles.first().executable.declaringClass.classLoader
+                    ?: return claimed
+                val checkDowngradeMethod = findCheckDowngradeMethod(classLoader) ?: return claimed
+                val builder = module.hook(checkDowngradeMethod)
+                if (module.apiVersion >= XposedInterface.API_102) {
+                    builder.setId(HOOK_ID)
+                }
+                builder.intercept(createCheckDowngradeHooker(module))
+            }
+            return claimed
         }
 
         fun clearModuleRef() {
