@@ -7,7 +7,11 @@
     public void onPackageLoaded(...);
     public void onPackageReady(...);
     public void onSystemServerStarting(...);
+    public boolean onHotReloading(...);
+    public void onHotReloaded(...);
 }
+
+-dontwarn io.github.libxposed.annotation.**
 
 # Kotlin
 -assumenosideeffects class kotlin.jvm.internal.Intrinsics {

@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "com.berdik.letmedowngrade"
-    compileSdk = 36
-    buildToolsVersion = "36.0.0"
+    compileSdk = 37
+    buildToolsVersion = "37.0.0"
 
     defaultConfig {
         minSdk = 31
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 11
         versionName = "1.1.0"
         applicationId = "com.berdik.letmedowngrade"
