@@ -2,6 +2,7 @@ package com.berdik.letmedowngrade
 
 import android.util.Log
 import com.berdik.letmedowngrade.hookers.PackageManagerServiceHooker
+import com.berdik.letmedowngrade.hookers.SignatureVerificationHooker
 import io.github.libxposed.api.XposedModule
 import io.github.libxposed.api.XposedModuleInterface.HotReloadedParam
 import io.github.libxposed.api.XposedModuleInterface.HotReloadingParam
@@ -20,6 +21,12 @@ class LetMeDowngrade : XposedModule() {
 
         try {
             PackageManagerServiceHooker.hook(param, this)
+        } catch (e: Exception) {
+            log(Log.ERROR, TAG, "ERROR: $e")
+        }
+
+        try {
+            SignatureVerificationHooker.hook(param, this)
         } catch (e: Exception) {
             log(Log.ERROR, TAG, "ERROR: $e")
         }
